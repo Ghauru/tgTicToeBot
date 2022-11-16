@@ -141,7 +141,8 @@ def bot_message(message):
     if 'скрыть' in message.text.lower() or message.text == '/remove':
         markup = types.ReplyKeyboardRemove()
         bot.send_message(message_id, 'Скрываю меню бота', reply_markup=markup)
-    if message.text.lower() == 'меню' or message.text.lower() == 'menu' or message.text.lower() == '/menu':
+    if message.text.lower() == 'меню' or message.text.lower() == 'menu' or message.text.lower() == '/menu' \
+            or message.text == '/menu@ghauruXO_bot':
         markup = create_reply_keyboard()
         bot.send_message(message_id, 'Меню бота', reply_markup=markup)
 
