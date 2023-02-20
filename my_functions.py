@@ -53,3 +53,24 @@ def create_inline_keyboard():
     button9 = types.InlineKeyboardButton(messages.STAR, callback_data='btn9')
     markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9)
     return markup
+
+
+def create_bot_inline_keyboard(number):
+    markup = types.InlineKeyboardMarkup()
+    button_list = []
+    for i in range(1, 10):
+        if i!=number:
+            button_list.append(types.InlineKeyboardButton(messages.STAR, callback_data='btn' + str(i)))
+        else:
+            button_list.append(types.InlineKeyboardButton(messages.X, callback_data='btn' + str(i)))
+    button1 = button_list[0]
+    button2 = button_list[1]
+    button3 = button_list[2]
+    button4 = button_list[3]
+    button5 = button_list[4]
+    button6 = button_list[5]
+    button7 = button_list[6]
+    button8 = button_list[7]
+    button9 = button_list[8]
+    markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9)
+    return markup

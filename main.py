@@ -3,7 +3,8 @@ import config
 from text_const import buttons, messages
 from game_functions import *
 import random
-from my_functions import create_reply_keyboard, send_url_photo, send_file_photo, create_inline_keyboard
+from my_functions import create_reply_keyboard, send_url_photo, send_file_photo, create_inline_keyboard,\
+    create_bot_inline_keyboard
 import sqlite3
 
 sqlite_connect = sqlite3.connect('players.db', check_same_thread=False)
@@ -19,6 +20,24 @@ bot = telebot.TeleBot(config.TG_TOKEN)
 def create_game_field(message):
     butt = messages.STAR + messages.STAR + messages.STAR + messages.STAR + messages.STAR \
            + messages.STAR + messages.STAR + messages.STAR + messages.STAR
+    sql_insert_query = f'UPDATE players SET buttons = "{butt}" WHERE telegram_id = "{message.from_user.id}"'
+    cur = sqlite_connect.cursor()
+    try:
+        cur.execute(sql_insert_query)
+    except TypeError:
+        player_to_database(message)
+        cur.execute(sql_insert_query)
+    sqlite_connect.commit()
+    cur.close()
+
+
+def second_way(message, number):
+    butt = ''
+    for i in range(1, 10):
+        if i!= number:
+            butt += messages.STAR
+        else:
+            butt+= messages.X
     sql_insert_query = f'UPDATE players SET buttons = "{butt}" WHERE telegram_id = "{message.from_user.id}"'
     cur = sqlite_connect.cursor()
     try:
@@ -133,7 +152,12 @@ def bot_message(message):
         markup = types.ReplyKeyboardRemove()
         bot.send_message(message_id, 'Начинается игра...', reply_markup=markup)
         update_choice(message)
-        markup = create_inline_keyboard()
+        if message.text == messages.O:
+            number = random.choice(range(1, 10))
+            markup = create_bot_inline_keyboard(number)
+            second_way(message, number)
+        else:
+            markup = create_inline_keyboard()
         bot.send_message(message_id, 'Выберите кнопку', reply_markup=markup)
     if message.text == '/cat' or message.text == buttons.CAT_BUTTON or message.text == '/cat@ghauruXO_bot' \
             or 'кот' in message.text.lower():
@@ -169,21 +193,24 @@ def change_callback_buttons(callback):
                 butt = butt[:i-1] + choice + butt[i:]
                 numbers = []
                 mess = 'Выбирайте кнопку'
-                for k in range(len(butt)):
-                    if butt[k] == messages.STAR:
-                        numbers.append(k)
-                if choice == messages.X and numbers:
-                    bot_turn = random.choice(numbers)
-                    if bot_turn != 8:
-                        butt = butt[:bot_turn] + messages.O + butt[bot_turn + 1:]
-                    else:
-                        butt = butt[:bot_turn] + messages.O
-                elif numbers:
-                    bot_turn = random.choice(numbers)
-                    if bot_turn != 8:
-                        butt = butt[:bot_turn] + messages.X + butt[bot_turn + 1:]
-                    else:
-                        butt = butt[:bot_turn] + messages.X
+                if check_victory(butt):
+                    pass
+                else:
+                    for k in range(len(butt)):
+                        if butt[k] == messages.STAR:
+                            numbers.append(k)
+                    if choice == messages.X and numbers:
+                        bot_turn = random.choice(numbers)
+                        if bot_turn != 8:
+                            butt = butt[:bot_turn] + messages.O + butt[bot_turn + 1:]
+                        else:
+                            butt = butt[:bot_turn] + messages.O
+                    elif numbers:
+                        bot_turn = random.choice(numbers)
+                        if bot_turn != 8:
+                            butt = butt[:bot_turn] + messages.X + butt[bot_turn + 1:]
+                        else:
+                            butt = butt[:bot_turn] + messages.X
             elif callback.data == 'btn' + str(i) and butt[i - 1] != messages.STAR:
                 if mess == messages.TAKEN_SPOT:
                     mess = messages.TAKEN_SPOT2
