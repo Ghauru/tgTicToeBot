@@ -114,6 +114,17 @@ def update_database(message, butt, mess):
     cur.close()
 
 
+@bot.inline_handler(func=lambda query: 'член' in query.query)
+def query_dick(inline_query):
+    try:
+        l = types.InlineQueryResultArticle('1', 'Большой', types.InputTextMessageContent(f' длина твоего члена 50 см🍌'))
+        l1 = types.InlineQueryResultArticle('2', 'Маленький', types.InputTextMessageContent(f' длина твоего члена 0.1мм😂'))
+        l2 = types.InlineQueryResultArticle('3', 'Я девочка', types.InputTextMessageContent(f'Я девочка 💅'))
+        bot.answer_inline_query(inline_query.id, [l, l1, l2])
+    except Exception as e:
+        print(e)
+
+
 @bot.inline_handler(func=lambda query: 'кот' in query.query or 'cat' in query.query)
 def query_photo(inline_query):
     send_url_photo(bot, inline_query)

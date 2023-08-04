@@ -20,7 +20,7 @@ def send_url_photo(bot, inline_query):
         temp = ''
         photo_list = []
         while k < 5:
-            source = get(f"https://aws.random.cat/view/{random.choice(range(1000))}").text
+            source = get(f"http://random.cat/view/{random.choice(range(1000))}").text
             if source != temp:
                 photo = source.split("src=\"")[1].split("\"")[0]
                 temp = photo
